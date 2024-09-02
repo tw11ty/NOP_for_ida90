@@ -4,5 +4,5 @@
 
 ida9.0 python ida_idaapi删除了get_inf_structure，于是使用idc.get_inf_attr()来获取处理器类型以及位数。
 
-对于大小端没有直接的返回值来获取，以后继续完善一下。
+对于大小端没有直接的返回值来获取，后面会继续完善。
 
