@@ -33,20 +33,25 @@ class NopPlugin(idaapi.plugin_t):
             print(f"Unsupported architecture: {proc_name}")
             return
 
-        # Get the selected instructions
-        selection = []
+        # Check if a range is selected
         selstart, selend = idc.read_selection_start(), idc.read_selection_end()
-        if selstart == idc.BADADDR or selend == idc.BADADDR:
-            print("Select an instruction or a range of instructions.")
+        if selstart == idc.BADADDR or selend == idc.BADADDR or selstart == selend:
+            # No range selected or only one instruction selected
+            selstart = selend = idc.here()
+
+        selection = list(idautils.Heads(selstart, selend + 1))  # Include the end address
+
+        if not selection:
+            print("No instructions selected.")
             return
-        for head in idautils.Heads(selstart, selend):
-            selection.append(head)
 
         # NOP the selected instructions
         for ea in selection:
             length = ida_bytes.get_item_size(ea)
             patched_nop = nop_opcode * (length // len(nop_opcode))  # Adjust NOP length
             ida_bytes.patch_bytes(ea, patched_nop)
+
+        print(f"NOP applied from {hex(selstart)} to {hex(selend)}.")
 
     def term(self):
         pass
